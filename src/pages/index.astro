@@ -1,0 +1,11 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+<BaseLayout title="David Nogales Pérez · Software Engineer" description="Software engineer focused on backend systems, data engineering, automation, and reproducible infrastructure.">
+  <p class="eyebrow">Software engineer · Barcelona</p>
+  <h1>Building dependable systems and useful tools.</h1>
+  <p class="lede">I work across backend development, data engineering, automation, and DevOps—with a soft spot for reproducible environments and self-hosted systems.</p>
+  <div class="actions"><a class="button" href={`${base}/projects`}>See projects</a><a class="button secondary" href={`${base}/cv/`}>Read CV</a></div>
+  <section><h2>Current focus</h2><div class="grid"><article class="card"><h3>Backend & data</h3><p>APIs, ETL pipelines, databases, and dependable daily workflows.</p></article><article class="card"><h3>Reproducibility</h3><p>Containers, Nix, automation, and infrastructure that is easy to understand.</p></article><article class="card"><h3>Learning in public</h3><p>Notes on software, music technology, and the tools behind this site.</p></article></div></section>
+</BaseLayout>

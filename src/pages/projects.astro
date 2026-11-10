@@ -1,0 +1,13 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const projects = [
+  { name: "DeepEarTraining", stack: "Python · PyTorch · FastAPI · Astro", href: "https://github.com/DavidNogales/DeepEarTraining", text: "On-demand melodic dictation exercises generated with deep learning. Bachelor's degree final project." },
+  { name: "Logo3D", stack: "Python · ANTLR · VPython", href: "https://github.com/DavidNogales/Logo3D-LP-FIB", text: "An interpreter for a 3D version of Logo, designed to draw shapes from simple commands." },
+  { name: "melody-generator", stack: "Music21 · TensorFlow · Keras", href: "https://github.com/DavidNogales/melody-generator", text: "A melody generator trained on the Bach chorales dataset." },
+  { name: "clawdius-landing", stack: "HTML · CSS · Bootstrap", href: "https://github.com/DavidNogales/clawdius-landing", text: "A small responsive product landing page." },
+];
+---
+<BaseLayout title="Projects · David Nogales Pérez" description="Selected software and music-technology projects.">
+  <p class="eyebrow">Selected work</p><h1>Projects</h1><p class="lede">Software projects spanning machine learning, language tooling, web development, and music technology.</p>
+  <div class="grid">{projects.map((project) => <article class="card"><p class="meta">{project.stack}</p><h2><a href={project.href} rel="noreferrer">{project.name}</a></h2><p>{project.text}</p></article>)}</div>
+</BaseLayout>

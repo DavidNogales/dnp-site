@@ -1,0 +1,83 @@
+profile:
+  name: David Nogales Pérez
+  location: Barcelona, Spain
+  contact:
+    label: Contact me
+    url: ../contact/
+  github:
+    label: github.com/DavidNogales
+    url: https://github.com/DavidNogales
+
+about: >-
+  I am a Computer Science engineer from FIB-UPC with a focus on backend development,
+  data engineering, and automation. I have a strong interest in DevOps, particularly
+  in containerization and reproducible development environments. As a hobby, I
+  maintain a home server running various content services, and I enjoy experimenting
+  with tools that streamline workflows and make my life easier.
+
+education:
+  - institution: Universitat Politècnica de Catalunya
+    location: Barcelona, Spain
+    qualification: BS Computer Science
+    dates: Sep 2018 - May 2023
+  - institution: JEDI Academy
+    location: Barcelona, Spain
+    qualification: Course Deep Learning
+    dates: Jan 2022 - Feb 2022
+  - institution: JEDI Academy
+    location: Barcelona, Spain
+    qualification: Course Machine Learning
+    dates: Jun 2021 - Jul 2021
+  - institution: JEDI Academy
+    location: Barcelona, Spain
+    qualification: Course Web Development
+    dates: Jun 2021 - Jul 2021
+  - institution: Universidad Mayor de San Simón
+    location: Cochabamba, Bolivia
+    qualification: BS Computer Science
+    dates: Feb 2015 - Jun 2017
+
+experience:
+  - role: Software Engineer
+    location: Barcelona, Spain
+    company: BMAT Music Innovators
+    dates: Feb 2024 - Present
+    achievements:
+      - Monitor and maintain multiple daily data pipelines, ensuring consistent performance and accurate ingestion from various sources.
+      - "Designed and implemented two services: the first, an ETL pipeline to extract and transform data from internal services for a new product; and the second, an API to fetch and aggregate data according to a custom dashboard's requirements."
+  - role: Data Analyst Intern
+    location: Barcelona, Spain
+    company: Clevertask
+    dates: Oct 2023 - Jan 2024
+    achievements:
+      - Conceived and executed the concept for automating a critical task with a Python script using Selenium for bulk data input from CSV files and extraction of output reports from a web application.
+
+skills:
+  - label: "Programming Languages:"
+    value: Python, SQL, Javascript, C++, Java, LaTeX
+  - label: "Backend:"
+    value: Docker, Docker Compose, PostgreSQL, FastAPI, Selenium, SQLAlchemy
+  - label: "Frontend:"
+    value: Tailwind, Bootstrap, AstroJS
+  - label: "Languages:"
+    value: Spanish - Native, English - C1, Catalan - A2, German - A1
+  - label: "Other:"
+    value: Homelab enthusiast and music composer
+
+projects:
+  - name: DeepEarTraining
+    url: https://github.com/DavidNogales/DeepEarTraining
+    technologies: Python, Pytorch, Jupyter Notebooks, Seaborn, Music21, AstroJS, FastAPI
+    description: A deep learning based app for constrained, and on-demand generation of melodic dictation exercises. Final project of Bachelor's degree in Computer Science at FIB.
+  - name: Logo3D
+    url: https://github.com/DavidNogales/Logo3D-LP-FIB
+    technologies: Python, ANTLR, vpython
+    description: An interpreter for the 3D version of the Logo programming language in which you can draw shapes by writing simple commands.
+  - name: melody-generator
+    url: https://github.com/DavidNogales/melody-generator
+    technologies: Music21, Tensorflow, Keras, Pandas, Numpy, Matplotlib, Lilypond, Fluidsynth
+    description: A simple melody generator based in Bach chorales dataset. Final project of Deep Learning Course at JEDI Academy.
+  - name: clawdius-landing
+    url: https://github.com/DavidNogales/clawdius-landing
+    technologies: Bootstrap, HTML, CSS
+    description: A simple responsive landing page developed with Bootstrap, HTML and CSS.

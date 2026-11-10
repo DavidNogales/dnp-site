@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Astro output and caches
+dist/
+.astro/
+
+# Generated CV artifacts
+public/cv/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+.direnv/
+
+# Nix build results
+result
+result-*
+
+# Test coverage and logs
+coverage/
+*.log
+pnpm-debug.log*
+npm-debug.log*
+
+# Editor, OS, and local agent state
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.agents/
+.codex/

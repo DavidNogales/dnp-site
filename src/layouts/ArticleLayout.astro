@@ -1,0 +1,13 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+const { title, description, published, tags = [] } = Astro.props;
+---
+<BaseLayout title={`${title} · DNP`} description={description}>
+  <article class="prose">
+    <p class="eyebrow">{published.toLocaleDateString("en", { dateStyle: "long" })}</p>
+    <h1>{title}</h1>
+    <p class="lede">{description}</p>
+    <p class="meta">{tags.join(" · ")}</p>
+    <slot />
+  </article>
+</BaseLayout>

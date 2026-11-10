@@ -1,0 +1,10 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
+---
+<BaseLayout title="Blog · David Nogales Pérez" description="Technical notes about software, data, infrastructure, and music technology.">
+  <p class="eyebrow">Notes</p><h1>Blog</h1><p class="lede">Technical writing on tools, systems, and experiments.</p>
+  <div class="grid">{posts.map((post) => <ArticleCard slug={post.id} {...post.data} />)}</div>
+</BaseLayout>
