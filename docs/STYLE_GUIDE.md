@@ -53,7 +53,6 @@ Both families are self-hosted variable TTF files in `src/assets/fonts/`, loaded 
 | `--weight-semibold` | `600` | Section headings and restrained emphasis |
 | `--text-2xs` | `.75rem` | Compact dates and footer metadata |
 | `--text-xs` | `.78rem` | Metadata and eyebrow labels |
-| `--text-brand` | `.85rem` | Compact wordmark |
 | `--text-sm` | `.9rem` | Navigation and form labels |
 | `--text-base` | `1rem` | Body copy |
 | `--text-list-heading` | `1.15rem` | Project list headings |
@@ -96,6 +95,8 @@ Add a breakpoint only when content fails, not to target a device brand.
 ## Component conventions
 
 ### Navigation
+
+The home link uses the crescent-harp monogram: the dark and light SVGs follow the site's explicit theme, while the auto SVG is reserved for the browser favicon and follows the operating-system preference. Keep all three source assets in `src/assets/brand/`.
 
 Use semantic `nav` and list markup. Navigation uses Inconsolata 500, muted text, a text-color hover, and an underlined red current page. Keep labels short. Horizontal overflow is preferable to illegibly compressed text.
 
