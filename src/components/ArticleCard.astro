@@ -1,6 +1,14 @@
 ---
-interface Props { slug: string; title: string; description: string; published: Date; tags: string[]; }
-const { slug, title, description, published, tags } = Astro.props;
+interface Props { slug: string; title: string; published: Date; }
+const { slug, title, published } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
-<article class="card"><p class="meta">{published.toLocaleDateString("en")}</p><h2><a href={`${base}/blog/${slug}`}>{title}</a></h2><p>{description}</p><p class="meta">{tags.join(" · ")}</p></article>
+<article><h2><a href={`${base}/blog/${slug}`}>{title}</a></h2><time datetime={published.toISOString()}>{published.toLocaleDateString("en", { year: "numeric", month: "short", day: "numeric" })}</time></article>
+<style>
+  article { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: baseline; padding-block: 1.15rem; border-bottom: 1px solid var(--border); }
+  h2 { font-size: var(--text-h3); font-weight: var(--weight-medium); }
+  a { color: var(--text); text-decoration: none; }
+  a:hover { color: var(--accent); }
+  time { color: var(--muted); font-family: var(--font-mono); font-size: var(--text-2xs); white-space: nowrap; }
+  @media (max-width: 32rem) { article { grid-template-columns: 1fr; gap: .25rem; } }
+</style>

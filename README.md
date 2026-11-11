@@ -2,6 +2,8 @@
 
 Static personal site built with Astro, Typst, and Nix.
 
+UI changes must follow the authoritative [style guide](docs/STYLE_GUIDE.md).
+
 ## Development
 
 ```bash

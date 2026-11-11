@@ -8,6 +8,16 @@ const projects = [
 ];
 ---
 <BaseLayout title="Projects · David Nogales Pérez" description="Selected software and music-technology projects.">
-  <p class="eyebrow">Selected work</p><h1>Projects</h1><p class="lede">Software projects spanning machine learning, language tooling, web development, and music technology.</p>
-  <div class="grid">{projects.map((project) => <article class="card"><p class="meta">{project.stack}</p><h2><a href={project.href} rel="noreferrer">{project.name}</a></h2><p>{project.text}</p></article>)}</div>
+  <header class="page-intro"><p class="eyebrow">Selected work</p><h1>Projects</h1><p class="lede">Software, data, language tooling, and music technology.</p></header>
+  <div class="project-list">{projects.map((project) => <article><h2><a href={project.href} rel="noreferrer">{project.name} ↗</a></h2><p>{project.text}</p><p class="meta">{project.stack}</p></article>)}</div>
 </BaseLayout>
+<style>
+  .project-list { max-width: var(--reading); }
+  article { padding-block: 1.75rem; border-bottom: 1px solid var(--border); }
+  article:first-child { padding-top: 0; }
+  h2 { font-size: var(--text-list-heading); }
+  h2 a { color: var(--text); text-decoration: none; }
+  h2 a:hover { color: var(--accent); }
+  article p { margin: .45rem 0 0; }
+  .meta { margin-top: .65rem; }
+</style>

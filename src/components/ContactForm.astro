@@ -29,11 +29,13 @@ const formId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID?.trim();
   });
 </script>
 <style>
-  form { max-width: 40rem; display: grid; gap: 1rem; }
-  label { display: grid; gap: .35rem; font-weight: 700; }
-  label span { color: var(--muted); font-weight: 400; }
-  input, textarea { width: 100%; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: .4rem; padding: .7rem; }
+  form { max-width: var(--reading); display: grid; gap: 1.35rem; }
+  label { display: grid; gap: .4rem; font-family: var(--font-mono); font-size: var(--text-sm); font-weight: var(--weight-medium); }
+  label span { color: var(--muted); font-weight: var(--weight-regular); }
+  input, textarea { width: 100%; color: var(--text); background: transparent; border: 1px solid var(--border); border-radius: 0; padding: .75rem; }
+  input:focus, textarea:focus { border-color: var(--accent); }
   textarea { resize: vertical; }
   .trap { position: absolute; left: -10000px; }
-  .notice { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: 1rem; }
+  .notice { color: var(--muted); }
+  [data-status] { min-height: 1.5em; margin: 0; color: var(--muted); }
 </style>
