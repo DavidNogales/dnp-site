@@ -1,4 +1,16 @@
-<footer><div class="container">© {new Date().getFullYear()} David Nogales Pérez</div></footer>
+<footer transition:name="footer" transition:animate="none"><div class="container">© {new Date().getFullYear()} David Nogales Pérez</div></footer>
 <style>
-  footer { color: var(--muted); font-family: var(--font-mono); font-size: var(--text-2xs); padding-block: 2rem; }
+  footer {
+    position: fixed;
+    inset: auto 0 0 var(--sidebar-width);
+    z-index: 2;
+    height: var(--footer-height);
+    display: grid;
+    align-items: center;
+    padding-block: 1rem calc(1rem + env(safe-area-inset-bottom));
+    background: var(--bg);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+  }
 </style>

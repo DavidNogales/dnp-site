@@ -123,7 +123,7 @@ Every control has a visible label. Labels and technical hints use Inconsolata; i
 
 ### Footer
 
-Footer metadata is quiet, small, and mono. It should not compete with content or become a secondary navigation panel.
+Footer metadata is quiet, small, and mono. Copyright stays fixed at the viewport bottom, to the right of the sidebar, on the theme background. `--footer-height` reserves `5rem` plus the bottom safe area in both layout and scroll padding so final content and focused controls can scroll clear of it. The footer has a separate stationary view-transition snapshot. It should not compete with content or become a secondary navigation panel.
 
 ### CV sections
 

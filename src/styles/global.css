@@ -30,6 +30,7 @@
   --max: 60rem;
   --reading: 42.5rem;
   --sidebar-width: clamp(7rem, 18vw, 13rem);
+  --footer-height: calc(5rem + env(safe-area-inset-bottom));
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "Inconsolata", ui-monospace, "SFMono-Regular", Consolas, monospace;
   --weight-regular: 400;
@@ -64,7 +65,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; background: var(--bg); }
+html { scroll-behavior: smooth; scroll-padding-bottom: var(--footer-height); background: var(--bg); }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: var(--text-base); font-weight: var(--weight-regular); line-height: var(--leading-body); }
 a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: .2em; transition: color .15s ease; }
 a:hover { color: var(--accent-hover); }
@@ -73,8 +74,8 @@ button, input, textarea { font: inherit; font-family: var(--font-sans); }
 code, kbd, pre, samp { font-family: var(--font-mono); }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .container { width: min(calc(100% - clamp(2rem, 8vw, 6rem)), var(--max)); margin-inline: auto; }
-.site-content { margin-left: var(--sidebar-width); min-width: 0; overflow-wrap: anywhere; }
-main { min-height: calc(100vh - 10rem); padding-block: clamp(4rem, 10vw, 7rem); background: var(--bg); }
+.site-content { margin-left: var(--sidebar-width); min-width: 0; padding-bottom: var(--footer-height); overflow-wrap: anywhere; }
+main { min-height: calc(100svh - var(--footer-height)); padding-block: clamp(4rem, 10vw, 7rem); background: var(--bg); }
 @keyframes page-settle {
   from { transform: translateY(.35rem); }
   to { transform: translateY(0); }
