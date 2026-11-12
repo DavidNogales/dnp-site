@@ -71,7 +71,7 @@ Responsive heading and lede sizes already use `clamp()`. Do not make hero type l
 
 ### CV typography
 
-The Astro CV follows this web type system and reads data from `cv/data.yaml`. The Typst PDF reads the same data but remains a print-specific layout with its own font metrics and pagination constraints. Keep content synchronized through YAML; do not force identical browser and Typst line breaks. Any print font change must preserve the one-page PDF and be verified through the existing CV build.
+The Astro CV follows this web type system and reads data from `cv/data.yaml`. The Typst PDF reads the same data and uses the light Ember Void palette: `#EEE6DA` page, `#1A1818` primary text, `#655C56` metadata, `#C4B8AA` rules, and `#B91D15` links. It remains a print-specific layout with its own font metrics and pagination constraints. Keep content synchronized through YAML; do not force identical browser and Typst line breaks. Any print style change must preserve the one-page PDF and be verified through the existing CV build.
 
 ## Layout and spacing
 

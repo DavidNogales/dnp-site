@@ -1,23 +1,32 @@
 #import "@preview/fontawesome:0.6.2": fa-icon
 
+#let font-sans = "Space Grotesk"
+#let font-mono = "Inconsolata"
+#let color-background = rgb("#eee6da")
+#let color-text = rgb("#1a1818")
+#let color-muted = rgb("#655c56")
+#let color-border = rgb("#c4b8aa")
+#let color-accent = rgb("#b91d15")
+#let metadata(body) = text(font: font-mono, fill: color-muted)[#body]
+
 #let section(title) = block(above: 5pt, below: 4pt)[
   #move(dx: -14pt)[
     #block(width: 100% + 14pt)[
-      #text(size: 10.5pt, smallcaps(title))
+      #text(font: font-mono, weight: "medium", size: 10.5pt, tracking: 0.04em)[#upper(title)]
       #v(-2pt)
-      #move(dy: -8pt, line(length: 100%, stroke: 0.5pt))
+      #move(dy: -8pt, line(length: 100%, stroke: (paint: color-border, thickness: 0.5pt)))
     ]
   ]
 ]
 
 #let entry(primary, location, secondary, dates, body: none, gap: 14pt) = block(below: gap)[
   #grid(
-    columns: (1fr, 92pt),
+    columns: (1fr, 116pt),
     column-gutter: 10pt,
     row-gutter: 4pt,
     align: (left + horizon, left + horizon),
-    [#strong(primary)], [#location],
-    [#secondary], [#dates],
+    [#strong(primary)], [#metadata(location)],
+    [#secondary], [#metadata(dates)],
   )
   #if body != none {
     v(4pt)
