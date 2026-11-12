@@ -20,7 +20,8 @@ const isCurrent = (href: string) => href === "/" ? Astro.url.pathname === `${bas
   header { background: var(--bg); }
   .bar { min-height: 4.75rem; display: flex; align-items: center; gap: 1.25rem; }
   .brand { display: grid; flex: none; width: 2.75rem; height: 2.75rem; place-items: center; }
-  .brand img { grid-area: 1 / 1; display: block; width: 100%; height: 100%; }
+  .brand img { grid-area: 1 / 1; width: 100%; height: 100%; }
+  .logo-dark { display: block; }
   .logo-light { display: none; }
   :global(:root[data-theme="light"]) .logo-dark { display: none; }
   :global(:root[data-theme="light"]) .logo-light { display: block; }
