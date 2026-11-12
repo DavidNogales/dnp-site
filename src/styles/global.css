@@ -29,6 +29,7 @@
   --code: #1b1919;
   --max: 60rem;
   --reading: 42.5rem;
+  --sidebar-width: clamp(7rem, 18vw, 13rem);
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "Inconsolata", ui-monospace, "SFMono-Regular", Consolas, monospace;
   --weight-regular: 400;
@@ -63,7 +64,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; background: var(--bg); }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: var(--text-base); font-weight: var(--weight-regular); line-height: var(--leading-body); }
 a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: .2em; transition: color .15s ease; }
 a:hover { color: var(--accent-hover); }
@@ -72,7 +73,17 @@ button, input, textarea { font: inherit; font-family: var(--font-sans); }
 code, kbd, pre, samp { font-family: var(--font-mono); }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .container { width: min(calc(100% - clamp(2rem, 8vw, 6rem)), var(--max)); margin-inline: auto; }
-main { min-height: calc(100vh - 10rem); padding-block: clamp(4rem, 10vw, 7rem); }
+.site-content { margin-left: var(--sidebar-width); min-width: 0; overflow-wrap: anywhere; }
+main { min-height: calc(100vh - 10rem); padding-block: clamp(4rem, 10vw, 7rem); background: var(--bg); }
+@keyframes page-settle {
+  from { transform: translateY(.35rem); }
+  to { transform: translateY(0); }
+}
+::view-transition-group(page-content) { animation: none; }
+::view-transition-old(page-content),
+::view-transition-new(page-content) { mix-blend-mode: normal; }
+::view-transition-old(page-content) { opacity: 0; }
+::view-transition-new(page-content) { opacity: 1; }
 h1, h2, h3 { color: var(--text); line-height: var(--leading-heading); letter-spacing: var(--tracking-tight); }
 h1 { max-width: 47rem; margin: 0 0 1.25rem; font-size: var(--text-h1); font-weight: var(--weight-medium); }
 h2 { margin: 0; font-size: var(--text-h2); font-weight: var(--weight-semibold); }
@@ -97,6 +108,7 @@ p { margin-block: 0 1rem; }
 .button { display: inline-block; padding: .6rem .85rem; border: 1px solid var(--border); border-radius: 0; background: transparent; color: var(--text); font-weight: var(--weight-semibold); text-decoration: none; cursor: pointer; }
 .button:hover { border-color: var(--accent); color: var(--accent); }
 @media (max-width: 40rem) {
+  :root { --sidebar-width: 6.5rem; }
   .container { width: min(calc(100% - 2rem), var(--max)); }
   main { padding-block: 3.5rem; }
 }

@@ -77,6 +77,7 @@ The Astro CV follows this web type system and reads data from `cv/data.yaml`. Th
 
 - `--max: 60rem` is the outer content width.
 - `--reading: 42.5rem` is the preferred measure for prose, forms, and CV sections.
+- `--sidebar-width: clamp(7rem, 18vw, 13rem)` reserves the fixed left navigation column; it becomes `6.5rem` at `40rem` and below. Content and footer sit to its right.
 - `.container` supplies responsive horizontal margins. At `40rem` and below it keeps a `1rem` margin on each side.
 - Main content uses responsive vertical padding from `4rem` to `7rem`, reduced to `3.5rem` on narrow screens.
 - Page introductions and major sections separate themselves with whitespace. Thin borders are acceptable only where they clarify repeated entries or section boundaries.
@@ -98,7 +99,7 @@ Add a breakpoint only when content fails, not to target a device brand.
 
 The home link uses the crescent-harp monogram: the dark and light SVGs follow the site's explicit theme, while the auto SVG is reserved for the browser favicon and follows the operating-system preference. Keep all three source assets in `src/assets/brand/`.
 
-Use semantic `nav` and list markup. Navigation uses Inconsolata 500, muted text, a text-color hover, and an underlined red current page. Keep labels short. Horizontal overflow is preferable to illegibly compressed text.
+Use semantic `nav` and list markup. Navigation stays vertical in a fixed left sidebar, with its own vertical scrolling on short screens. Navigation uses Inconsolata 500, muted text, a text-color hover, and a red current page. A separate red underline uses the shared `nav-indicator` view-transition name to slide and resize between active labels over 180ms, including back/forward navigation. Reduced motion and browsers without native view transitions update the underline immediately. Keep labels short and link targets at least `2.75rem` tall. The theme toggle occupies the bottom-left corner in its own non-scrolling area with a `2.75rem` touch target and bottom safe-area padding. The sidebar narrows on mobile while retaining all links and the theme toggle.
 
 ### Links and buttons
 
@@ -130,13 +131,15 @@ The HTML CV uses ordinary sections, headings, definition lists, and restrained s
 
 ## Interaction and animation
 
-Transitions are limited to short color changes. Theme switching must remain keyboard-operable and update accessible state. Avoid parallax, scroll-triggered reveals, glowing effects, animated backgrounds, and decorative motion.
+Astro's `ClientRouter` handles internal page navigation. Main content stays fully opaque and settles vertically by `.35rem` over 180ms. Its snapshot group does not interpolate page height or width, avoiding distortion between differently sized pages. Do not fade the content to transparency. The sidebar stays visually stationary while its active link updates. `fallback="swap"` avoids sequential fade-out/fade-in when native view transitions are unavailable. Astro suppresses navigation animation for reduced-motion preferences and provides route announcements. Theme state transfers before each page swap. DOM event handlers initialize on `astro:page-load`; contact submissions opt out of router interception with `data-astro-reload`. See the [Astro view transitions guide](https://docs.astro.build/en/guides/view-transitions/) for lifecycle details.
+
+Other transitions are limited to short color changes. Theme switching must remain keyboard-operable and update accessible state. Avoid parallax, scroll-triggered reveals, glowing effects, animated backgrounds, and decorative motion.
 
 The global `prefers-reduced-motion: reduce` rule disables transitions, animation, and smooth scrolling. New components must work when motion is removed. Never make animation necessary to discover or understand content.
 
 ## Responsive design
 
-- Mobile: use one content column, preserve `1rem` side margins, stack paired metadata, and keep touch controls comfortably targetable.
+- Mobile: use one content column beside the compact left sidebar, preserve `1rem` content margins, stack paired metadata, and keep touch controls comfortably targetable.
 - Tablet: retain readable measures and allow whitespace to grow; do not introduce extra columns without content pressure.
 - Desktop: use the `60rem` outer cap and `42.5rem` reading measure. Whitespace is expected.
 - Large screens: keep the same caps. Do not scale type or gaps indefinitely to fill the viewport.

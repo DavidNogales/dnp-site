@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import Seo from "../components/Seo.astro";
@@ -7,17 +8,34 @@ import spaceGroteskUrl from "../assets/fonts/space-grotesk-variable.ttf?url";
 import "../styles/global.css";
 interface Props { title: string; description: string; }
 const { title, description } = Astro.props;
+// Keep content opaque; animate position without fading or resizing snapshots.
+const pageTransition = {
+  old: { name: "none" },
+  new: { name: "page-settle", duration: "180ms", easing: "ease-out", fillMode: "both" },
+};
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" transition:animate="none">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <ClientRouter fallback="swap" />
     <script is:inline>document.documentElement.dataset.theme=localStorage.getItem('theme')||((matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light')</script>
     <Seo title={title} description={description} />
     <link rel="icon" href={faviconUrl} type="image/svg+xml" />
     <link rel="preload" href={spaceGroteskUrl} as="font" type="font/ttf" crossorigin="anonymous" />
     <link rel="alternate" type="application/rss+xml" title="DNP blog" href={new URL("rss.xml", Astro.site)} />
   </head>
-  <body><Header /><main class="container"><slot /></main><Footer /></body>
+  <body>
+    <Header />
+    <div class="site-content">
+      <main class="container" transition:name="page-content" transition:animate={{ forwards: pageTransition, backwards: pageTransition }}><slot /></main>
+      <Footer />
+    </div>
+  </body>
 </html>
+<script>
+  document.addEventListener("astro:before-swap", (event) => {
+    event.newDocument.documentElement.dataset.theme = document.documentElement.dataset.theme;
+  });
+</script>
