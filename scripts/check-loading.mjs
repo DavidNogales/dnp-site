@@ -38,7 +38,7 @@ for (const type of ["inlineMath", "math", "code", "text"]) {
 }
 
 // Exercise initialization before window.load and across repeated page swaps.
-for (const [component, event] of [["ThemeToggle", "click"], ["ContactForm", "submit"]]) {
+for (const [component, event] of [["ThemeToggle", "click"]]) {
   const listeners = new Map();
   const createElement = () => ({
     handlers: [],
@@ -69,4 +69,8 @@ for (const [component, event] of [["ThemeToggle", "click"], ["ContactForm", "sub
     assert.equal(document.documentElement.dataset.theme, "dark");
   }
 }
+// Contact stays native so Formspree can perform hosted reCAPTCHA verification.
+const contact = readFileSync("src/components/ContactForm.astro", "utf8");
+assert.doesNotMatch(contact, /<script\b/, "Contact must not intercept native submissions");
+assert.match(contact, /<form\b[^>]*data-astro-reload[^>]*method="POST"/);
 console.log(`Loading checks passed; web fonts ${before} → ${after} bytes.`);

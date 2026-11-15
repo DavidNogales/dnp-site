@@ -125,7 +125,7 @@ Use semantic `code` and `pre`. Code uses Inconsolata, `--code`, `--text`, and a 
 
 ### Forms
 
-Every control has a visible label. Labels and technical hints use Inconsolata; inputs, textareas, and buttons use Space Grotesk. Controls use a transparent background, square corners, and a single border. Validation and submission status must be announced through semantic live regions.
+Every control has a visible label. Labels and technical hints use Inconsolata; inputs, textareas, and buttons use Space Grotesk. Controls use a transparent background, square corners, and a single border. Use native browser validation. Contact submits through a normal HTML POST to Formspree, where hosted verification and the submission result are shown; a muted note explains the navigation before submission. Do not intercept this form with AJAX while it relies on Formspree's hosted reCAPTCHA. Any future inline validation or submission status must be announced through semantic live regions.
 
 ### Footer
 

@@ -8,33 +8,9 @@ const formId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID?.trim();
     <label>Message<textarea name="message" rows="7" required></textarea></label>
     <input class="trap" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
     <button class="button" type="submit">Send message</button>
-    <p data-status role="status" aria-live="polite"></p>
+    <p class="submission-note">Continue to Formspree to complete verification and send your message.</p>
   </form>
 ) : <p class="notice">Contact form not configured. Set <code>PUBLIC_FORMSPREE_FORM_ID</code> to enable it.</p>}
-<script>
-  const initialized = new WeakSet<HTMLFormElement>();
-  function initializeContactForm() {
-    const form = document.querySelector<HTMLFormElement>("[data-contact]");
-    if (!form || initialized.has(form)) return;
-    initialized.add(form);
-    const status = form?.querySelector<HTMLElement>("[data-status]");
-    form?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!form.reportValidity() || !status) return;
-      const button = form.querySelector<HTMLButtonElement>("button");
-      if (button) button.disabled = true;
-      status.textContent = "Sending…";
-      try {
-        const response = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
-        if (!response.ok) throw new Error("Form submission failed");
-        form.reset(); status.textContent = "Message sent. Thank you.";
-      } catch { status.textContent = "Message could not be sent. Please try again."; }
-      finally { if (button) button.disabled = false; }
-    });
-  }
-  initializeContactForm();
-  document.addEventListener("astro:after-swap", initializeContactForm);
-</script>
 <style>
   form { max-width: var(--reading); display: grid; gap: 1.35rem; }
   label { display: grid; gap: .4rem; font-family: var(--font-mono); font-size: var(--text-sm); font-weight: var(--weight-medium); }
@@ -44,5 +20,5 @@ const formId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID?.trim();
   textarea { resize: vertical; }
   .trap { position: absolute; left: -10000px; }
   .notice { color: var(--muted); }
-  [data-status] { min-height: 1.5em; margin: 0; color: var(--muted); }
+  .submission-note { margin: 0; color: var(--muted); }
 </style>

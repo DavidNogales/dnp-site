@@ -25,7 +25,9 @@ When changing version metadata, run `pnpm test:version-builds` inside the Nix sh
 
 Tests build production output into **`.test-dist/`**, leaving deployable `dist/` untouched. The fixture uses `/`, a localhost site URL, and a fake Formspree ID. Browser tests intercept submissions and block third-party traffic. Port **4173** must be free; existing servers are not reused. Reports stay local and are gitignored.
 
-Playwright runs one worker, zero retries, fresh contexts, fixed English locale/UTC timezone, and four projects: desktop/mobile × light/dark. Coverage includes navigation/back/reload, theme persistence, blocked-font interactivity, loaded fonts, math-only CSS, text-token contrast, overflow, reduced motion, mocked form success/failure, and PDF availability. Failures retain screenshots/traces under `test-results/`; open the HTML report with `pnpm exec playwright show-report`.
+Playwright runs one worker, zero retries, fresh contexts, fixed English locale/UTC timezone, and four projects: desktop/mobile × light/dark. Coverage includes navigation/back/reload, theme persistence, blocked-font interactivity, loaded fonts, math-only CSS, text-token contrast, overflow, reduced motion, mocked native form submission, and PDF availability. Failures retain screenshots/traces under `test-results/`; open the HTML report with `pnpm exec playwright show-report`.
+
+Contact coverage includes required-field validation, native POST after client navigation, submitted fields, and JavaScript-disabled submission. All Formspree requests are intercepted locally; passing tests do not establish real reCAPTCHA completion or email delivery. Run only contact checks with `pnpm test:build && pnpm exec playwright test tests/browser/site.spec.ts -g contact`.
 
 ## Lighthouse profiles and budgets
 

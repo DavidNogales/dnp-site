@@ -29,10 +29,22 @@ The deployment workflow reads GitHub Actions **repository variables**, not the l
 To enable contact:
 
 1. Create a Formspree form.
-2. Set `PUBLIC_FORMSPREE_FORM_ID` locally and as a GitHub Actions repository variable.
-3. Add local, GitHub Pages, and custom domains to Formspree's allowed domains.
+2. Set `PUBLIC_FORMSPREE_FORM_ID=xvkapara` locally and as a GitHub Actions **repository variable** (only the ID, not the full endpoint). This builds the action `https://formspree.io/f/xvkapara`.
+3. Verify the destination email and form settings in the Formspree dashboard.
+4. If using Formspree's project-level **Restrict to Domain**, enter the deployed hostname (for example, `davidnogales.github.io`), without protocol or `/dnp-site`. Unauthorized-domain submissions are routed to spam; this setting alone does not establish the cause of a 403. See [Formspree's domain documentation](https://help.formspree.io/articles/form-and-project-settings/restrict-to-domain/).
+5. Rebuild/redeploy after changing the repository variable. An environment variable scoped only to the `github-pages` environment is not available to the separate build job.
 
 No email address or private API key is placed in frontend form code.
+
+### Troubleshooting contact submissions
+
+Astro on GitHub Pages uses the **Basic HTML** integration: a native `POST` to Formspree, with no contact-form JavaScript, SDK, CDN, or backend. `data-astro-reload` prevents Astro's router from intercepting submission. Browser validation runs first, then the page navigates to Formspree for verification and the submission result. The same behavior works without JavaScript.
+
+The production AJAX request returned HTTP 403 with: `In order to submit via AJAX, you need to set a custom key or reCAPTCHA must be disabled in this form's settings page.` This identifies a mismatch between the previous AJAX integration and the form's reCAPTCHA configuration, not an incorrect form ID. Native submission delegates verification to Formspree without disabling spam protection.
+
+Keep reCAPTCHA enabled. If inline AJAX submission is needed later, first configure compatible custom reCAPTCHA keys and token handling; adding an AJAX library alone does not change dashboard verification requirements. See [Formspree's reCAPTCHA settings](https://help.formspree.io/articles/form-and-project-settings/recaptcha-settings/). For further failures, inspect DevTools → Network → the Formspree POST URL, status, and response body before changing settings. A console-only `403` does not identify the cause.
+
+Browser tests intercept native navigation and inspect submitted fields, including with JavaScript disabled. They never send real email. A real verification/delivery check requires an intentional submission after deployment.
 
 ## Build version
 
