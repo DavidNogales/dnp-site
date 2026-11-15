@@ -69,8 +69,16 @@ for (const [component, event] of [["ThemeToggle", "click"]]) {
     assert.equal(document.documentElement.dataset.theme, "dark");
   }
 }
-// Contact stays native so Formspree can perform hosted reCAPTCHA verification.
+// Form controls fail closed until AJAX interception is installed. Provider loads lazily.
 const contact = readFileSync("src/components/ContactForm.astro", "utf8");
-assert.doesNotMatch(contact, /<script\b/, "Contact must not intercept native submissions");
+assert.match(contact, /<fieldset disabled>/);
+assert.match(contact, /<noscript>/);
+assert.match(contact, /initializeContact\(\)/);
+assert.match(contact, /astro:before-swap/);
+assert.match(contact, /astro:after-swap/);
 assert.match(contact, /<form\b[^>]*data-astro-reload[^>]*method="POST"/);
+for (const page of ["index", "contact/index"]) {
+  const html = readFileSync(`${dist}/${page}.html`, "utf8");
+  assert.doesNotMatch(html, /<script\b[^>]*src="https:\/\/challenges\.cloudflare\.com/, "No eager Turnstile script");
+}
 console.log(`Loading checks passed; web fonts ${before} → ${after} bytes.`);

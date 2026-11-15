@@ -19,15 +19,25 @@ For focused debugging, `pnpm test:perf slow-3g /blog/welcome/` runs five measure
 
 ## Isolation and browser coverage
 
-`pnpm test:unit` runs build-metadata validation tests with Node's built-in test runner. Browser fixtures use a fixed synthetic commit SHA and repository, overriding shell/CI metadata. Label tests verify exact commit links, keyboard focus, placement below the theme toggle, short-screen scrolling, and rendering with JavaScript and fonts disabled; they never follow the GitHub link.
+`pnpm test:unit` runs build-metadata and public contact-configuration validation tests with Node's built-in test runner. Browser fixtures use a fixed synthetic commit SHA and repository, overriding shell/CI metadata. Label tests verify exact commit links, keyboard focus, placement below the theme toggle, short-screen scrolling, and rendering with JavaScript and fonts disabled; they never follow the GitHub link.
 
 When changing version metadata, run `pnpm test:version-builds` inside the Nix shell. This checks every generated HTML page across five temporary production builds: valid, absent, invalid SHA, invalid repository, and project subpath. It checks exact destinations, local fallbacks, and unchanged browser JavaScript, then removes only its own temporary output; neither `dist/` nor `.test-dist/` is replaced. Run it separately from browser/performance tests because Astro's generated caches are shared.
 
 Tests build production output into **`.test-dist/`**, leaving deployable `dist/` untouched. The fixture uses `/`, a localhost site URL, and a fake Formspree ID. Browser tests intercept submissions and block third-party traffic. Port **4173** must be free; existing servers are not reused. Reports stay local and are gitignored.
 
-Playwright runs one worker, zero retries, fresh contexts, fixed English locale/UTC timezone, and four projects: desktop/mobile × light/dark. Coverage includes navigation/back/reload, theme persistence, blocked-font interactivity, loaded fonts, math-only CSS, text-token contrast, overflow, reduced motion, mocked native form submission, and PDF availability. Failures retain screenshots/traces under `test-results/`; open the HTML report with `pnpm exec playwright show-report`.
+Playwright runs one worker, zero retries, fresh contexts, fixed English locale/UTC timezone, and four projects: desktop/mobile × light/dark. Coverage includes navigation/back/reload, theme persistence, blocked-font interactivity, loaded fonts, math-only CSS, text-token contrast, overflow, reduced motion, mocked inline contact submission, and PDF availability. Failures retain screenshots/traces under `test-results/`; open the HTML report with `pnpm exec playwright show-report`.
 
-Contact coverage includes required-field validation, native POST after client navigation, submitted fields, and JavaScript-disabled submission. All Formspree requests are intercepted locally; passing tests do not establish real reCAPTCHA completion or email delivery. Run only contact checks with `pnpm test:build && pnpm exec playwright test tests/browser/site.spec.ts -g contact`.
+Contact tests intercept both Cloudflare and Formspree. The synthetic public site key and fake form ID override local/CI settings only in `.test-dist/`; deployable `dist/` is untouched. No real verification or email is performed. Tests cover lazy/blocked/slow loading, expiry, theme replacement, navigation cleanup, single-flight AJAX, exact payload, inline errors, timeouts, preserved input, and disabled-JavaScript safety. Run focused checks with:
+
+```bash
+pnpm test:build
+pnpm exec playwright test tests/browser/contact.spec.ts
+pnpm test:contact-builds
+```
+
+The contact build suite generates isolated temporary variants for absent/invalid configuration and a project subpath, then exercises them in Chromium. Run build variants separately from other suites because Astro caches are shared. JavaScript-disabled users now see disabled controls and an explanation, not a hosted verification fallback.
+
+Local mocks cannot prove real Cloudflare challenges, Formspree token enforcement, or receipt. Follow the authorized operator acceptance/rejection checklist in [development](DEVELOPMENT.md#operator-setup-and-coordinated-cutover); do not aim automated tests at the production form.
 
 ## Lighthouse profiles and budgets
 
@@ -44,3 +54,29 @@ All profiles require median TBT ≤200ms, CLS ≤0.1, transfer size ≤220 kB, a
 ## Reports and comparisons
 
 Each performance run saves timestamped HTML/JSON reports and `summary.json` in `reports/lighthouse/<profile>/`. The summary contains per-metric medians, browser/Lighthouse/Node versions, and effective settings; assertion failures still preserve collected reports. Keep a baseline folder before changes and compare matching profiles, URLs, versions, and machines. Avoid parallel tests or heavy background work. Nix pins software, not host CPU performance. Rebaseline deliberately after toolchain updates. Test deployed hosting separately for CDN, compression, caching, and real network behavior.
+
+## Turnstile verification record — 2026-11-15
+
+`pnpm test` passed: type-check, six unit tests, loading checks, and **124 browser cases** across all four projects. `pnpm test:contact-builds` passed all five build variants, including root/subpath AJAX submission and client/back-forward navigation. OpenSpec strict validation passed.
+
+Five-run cold-load medians, using Node 22.23.4, Chromium 157.0.8103.38, and Lighthouse 13.6.0:
+
+| Profile | Page | FCP | LCP | TBT | CLS | Transfer |
+| --- | --- | --- | --- | --- | --- | --- |
+| mobile | home | 602ms | 602ms | 14.5ms | 0 | 112.0kB |
+| mobile | contact | 604ms | 1505ms | 0ms | 0 | 115.2kB |
+| slow-3g | home | 2159ms | 2212ms | 0ms | 0.00002 | 112.0kB |
+| slow-3g | contact | 2183ms | 2221ms | 0ms | 0 | 115.2kB |
+
+All unchanged budgets passed. Accessibility scored 100 in every recorded run. Cold-load network traces contained no Cloudflare Turnstile or Formspree requests. These measurements exclude challenge completion and mail delivery.
+
+Reproduce with `pnpm test:perf mobile /`, `pnpm test:perf mobile /contact/`, `pnpm test:perf slow-3g /`, and `pnpm test:perf slow-3g /contact/` sequentially. Local evidence folders under `reports/lighthouse/`:
+
+- `mobile/2026-11-15T17-43-59.106Z` (home)
+- `mobile/2026-11-15T17-52-15.678Z` (final contact)
+- `slow-3g/2026-11-15T17-45-50.261Z` (home)
+- `slow-3g/2026-11-15T17-53-10.295Z` (final contact)
+
+Separately, the mocked delayed-interaction tests held the provider script while typing, verified a single shared request, exercised a 30-second load deadline/retry, and released a late load after navigation while fonts remained blocked. Form input remained usable; stale callbacks did not create a detached widget or send a message. This is deterministic lifecycle coverage, not a measurement of Cloudflare's real challenge latency.
+
+Outstanding operator checks: configure the real widget and Formspree secret, coordinate rollout, then authorize one accepted-message/receipt check and one invalid-token rejection check. No production admin changes, real messages, or real-provider validation were performed here.

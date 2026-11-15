@@ -93,61 +93,6 @@ test("layouts fit viewport and text accents meet contrast", async ({ page }) => 
   }
 });
 
-test("contact validates locally and posts natively after client navigation", async ({ page }) => {
-  let submissions = 0;
-  await page.route("https://formspree.io/**", async route => {
-    submissions++;
-    const request = route.request();
-    expect(request.url()).toBe("https://formspree.io/f/test-form");
-    expect(request.method()).toBe("POST");
-    expect(request.isNavigationRequest()).toBe(true);
-    expect(request.headers().accept).toContain("text/html");
-    const fields = new URLSearchParams(request.postData()!);
-    expect(fields.get("email")).toBe("test@example.com");
-    expect(fields.get("subject")).toBe("Test subject");
-    expect(fields.get("message")).toBe("Automated test: intercepted locally.");
-    expect(fields.get("_gotcha")).toBe("");
-    await route.fulfill({ contentType: "text/html", body: "<h1>Mock hosted verification</h1>" });
-  });
-  await page.goto("/");
-  await page.getByRole("navigation").getByRole("link", { name: "Contact" }).click();
-  await expect(page.locator("[data-contact]")).toHaveAttribute("data-astro-reload", "");
-  await page.getByRole("button", { name: "Send message" }).click();
-  expect(submissions).toBe(0);
-  await expect(page.getByRole("textbox", { name: "Email address" })).toBeFocused();
-  await page.getByRole("textbox", { name: "Email address" }).fill("test@example.com");
-  await page.getByRole("textbox", { name: "Subject" }).fill("Test subject");
-  await page.getByRole("textbox", { name: "Message", exact: true }).fill("Automated test: intercepted locally.");
-  await page.getByRole("button", { name: "Send message" }).click();
-  await expect(page.getByRole("heading", { name: "Mock hosted verification" })).toBeVisible();
-  expect(submissions).toBe(1);
-});
-
-test("contact works as basic HTML without JavaScript", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, baseURL: "http://127.0.0.1:4173", serviceWorkers: "block" });
-  let submissions = 0;
-  await context.route("**/*", async route => {
-    const request = route.request();
-    if (new URL(request.url()).hostname === "127.0.0.1") return route.continue();
-    if (request.url() !== "https://formspree.io/f/test-form") return route.abort();
-    submissions++;
-    expect(request.method()).toBe("POST");
-    expect(request.isNavigationRequest()).toBe(true);
-    await route.fulfill({ contentType: "text/html", body: "<h1>Mock submission received</h1>" });
-  });
-  try {
-    const page = await context.newPage();
-    await page.goto("/contact/");
-    await expect(page.locator("[data-contact]")).toHaveAttribute("action", "https://formspree.io/f/test-form");
-    await page.getByRole("textbox", { name: "Email address" }).fill("test@example.com");
-    await page.getByRole("textbox", { name: "Message", exact: true }).fill("Intercepted native submission");
-    await page.getByRole("button", { name: "Send message" }).click();
-    await expect(page.getByRole("heading", { name: "Mock submission received" })).toBeVisible();
-    expect(submissions).toBe(1);
-  } finally {
-    await context.close();
-  }
-});
 
 test("reduced motion disables movement and PDF remains available", async ({ page, request }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });

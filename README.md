@@ -19,7 +19,7 @@ make preview         # Build and preview production output
 The [GitHub Actions workflow](.github/workflows/deploy.yml) deploys to GitHub Pages on pushes to `main` or manual runs; pull requests only validate the build.
 
 1. Set **Settings → Pages → Source → GitHub Actions**.
-2. Under **Settings → Secrets and variables → Actions → Variables**, optionally set `SITE_URL`, `BASE_PATH`, and `PUBLIC_FORMSPREE_FORM_ID`. Defaults target `https://<owner>.github.io/<repository>/`; the contact form requires a Formspree ID.
+2. Under **Settings → Secrets and variables → Actions → Variables**, optionally set `SITE_URL` and `BASE_PATH`. Defaults target `https://<owner>.github.io/<repository>/`. Contact requires `PUBLIC_FORMSPREE_FORM_ID` and `PUBLIC_TURNSTILE_SITE_KEY`; configure the matching secret only in Formspree. Follow the [contact setup checklist](docs/DEVELOPMENT.md#operator-setup-and-coordinated-cutover).
 3. Push to `main` or run the deployment workflow manually.
 
 For a custom domain, configure it in Pages settings, set `SITE_URL` to its HTTPS origin, and set `BASE_PATH=/`.

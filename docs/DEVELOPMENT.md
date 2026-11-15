@@ -18,33 +18,42 @@ For spec-driven planning and implementation, see [OpenSpec](OPENSPEC.md).
 
 ## Environment and contact form
 
-Copy `.env.example` to `.env` before configuring local builds. `.env` is ignored by Git; never put private credentials in public frontend variables.
+Copy `.env.example` to ignored `.env` for local configuration. Never put private credentials in frontend variables.
 
-- `SITE_URL`: canonical origin, such as `https://example.com`.
-- `BASE_PATH`: deployment path; use `/` for a root site or `/repository` for project GitHub Pages.
-- `PUBLIC_FORMSPREE_FORM_ID`: public Formspree endpoint identifier, not a secret.
+- `SITE_URL`: canonical origin; production uses `https://davidnogales.com`.
+- `BASE_PATH`: `/` for the apex domain, or `/repository` for project Pages.
+- `PUBLIC_FORMSPREE_FORM_ID`: public form ID (`xvkapara`), not the full endpoint.
+- `PUBLIC_TURNSTILE_SITE_KEY`: public Cloudflare widget site key.
 
-The deployment workflow reads GitHub Actions **repository variables**, not the local `.env`. Its defaults use the repository owner's GitHub Pages origin and the repository name as the base path. For a custom domain, set `SITE_URL` to that origin, set `BASE_PATH=/`, and configure the domain in the repository's Pages settings.
+The workflow reads Actions **repository variables**, not your local `.env` or variables scoped only to the separate deploy job's `github-pages` environment. Changes require a new build/deployment. Both contact identifiers are public; the **Turnstile secret belongs only in Formspree's dashboard**, never in Git, frontend assets, or CI inputs.
 
-To enable contact:
+### Contact behavior
 
-1. Create a Formspree form.
-2. Set `PUBLIC_FORMSPREE_FORM_ID=xvkapara` locally and as a GitHub Actions **repository variable** (only the ID, not the full endpoint). This builds the action `https://formspree.io/f/xvkapara`.
-3. Verify the destination email and form settings in the Formspree dashboard.
-4. If using Formspree's project-level **Restrict to Domain**, enter the deployed hostname (for example, `davidnogales.github.io`), without protocol or `/dnp-site`. Unauthorized-domain submissions are routed to spam; this setting alone does not establish the cause of a 403. See [Formspree's domain documentation](https://help.formspree.io/articles/form-and-project-settings/restrict-to-domain/).
-5. Rebuild/redeploy after changing the repository variable. An environment variable scoped only to the `github-pages` environment is not available to the separate build job.
+The static Astro site sends `FormData` (including `cf-turnstile-response`) to Formspree using AJAX. Formspree validates the token server-side. No backend, React, or npm SDK is required. Verification, errors, and success remain on the contact page. The browser only loads Cloudflare's official script after form interaction.
 
-No email address or private API key is placed in frontend form code.
+JavaScript is now required: disabled scripts leave controls disabled with an explanation, not a hosted-page fallback. Missing public configuration disables contact. Blocked/failed verification offers retry without sending unverified data. Failed submissions preserve input. Connection loss or an unrecognized success response means delivery is uncertain; check before retrying. Tokens are renewed for subsequent attempts, never reused. No automatic message retries occur.
 
-### Troubleshooting contact submissions
+### Operator setup and coordinated cutover
 
-Astro on GitHub Pages uses the **Basic HTML** integration: a native `POST` to Formspree, with no contact-form JavaScript, SDK, CDN, or backend. `data-astro-reload` prevents Astro's router from intercepting submission. Browser validation runs first, then the page navigates to Formspree for verification and the submission result. The same behavior works without JavaScript.
+1. In **Cloudflare → Turnstile**, create a **Managed** widget for `davidnogales.com` (also covers its subdomains). Use hostnames without scheme, path, or port. Keep DNS-only records unchanged and leave pre-clearance disabled; this form needs neither proxying nor WAF clearance.
+2. Store its public site key in the repository variable `PUBLIC_TURNSTILE_SITE_KEY`. Keep the matching secret private. For real local testing, prefer a separate development widget/form; allow only intended development hostnames there.
+3. Prepare/test the frontend first. If possible, validate the combination on a separate staging Formspree form before changing production.
+4. Coordinate deployment with **Formspree → form xvkapara → Settings → CAPTCHA → Adjust settings → Cloudflare Turnstile**. Paste the matching secret and keep CAPTCHA enabled. The two changes are not atomic: old native reCAPTCHA code and new Turnstile settings (or the reverse) may temporarily fail. Do not disable CAPTCHA as a bridge.
+5. If Formspree's **Restrict to Domain** is enabled, update it to `davidnogales.com`, without scheme/path. Verify the form's destination email in Formspree.
+6. Operator acceptance check: intentionally submit one message, complete any verification, confirm the page never leaves the domain, and confirm receipt. Separately perform an authorized missing/invalid-token rejection check against the configured service. Local mocked tests cannot establish real delivery or server-side enforcement.
+7. Rollback both sides together: restore the prior native-submit frontend and its matching reCAPTCHA settings. Never expose the secret or disable protection to work around a mismatch.
 
-The production AJAX request returned HTTP 403 with: `In order to submit via AJAX, you need to set a custom key or reCAPTCHA must be disabled in this form's settings page.` This identifies a mismatch between the previous AJAX integration and the form's reCAPTCHA configuration, not an incorrect form ID. Native submission delegates verification to Formspree without disabling spam protection.
+Dashboard changes, deployment, and real submissions require operator action or explicit authorization; ordinary local tests perform none of them.
 
-Keep reCAPTCHA enabled. If inline AJAX submission is needed later, first configure compatible custom reCAPTCHA keys and token handling; adding an AJAX library alone does not change dashboard verification requirements. See [Formspree's reCAPTCHA settings](https://help.formspree.io/articles/form-and-project-settings/recaptcha-settings/). For further failures, inspect DevTools → Network → the Formspree POST URL, status, and response body before changing settings. A console-only `403` does not identify the cause.
+### Troubleshooting
 
-Browser tests intercept native navigation and inspect submitted fields, including with JavaScript disabled. They never send real email. A real verification/delivery check requires an intentional submission after deployment.
+- Missing configuration: set both public repository variables and rebuild. A well-formed but invalid site key will be rejected by Cloudflare; check hostname and key pairing.
+- Verification blocked/expired: preserve the message and use **Retry verification**. Script loading and submission each have a 30-second deadline; interactive challenges use Cloudflare's own timeout.
+- HTTP 403: inspect the response and provider settings. The earlier `In order to submit via AJAX...` error came from hosted reCAPTCHA settings, not a private form ID.
+- Other HTTP errors: inspect the POST status and JSON response in DevTools. The UI renders messages as text, never response HTML.
+- Network interruption: delivery may already have occurred. There is no client-side exactly-once guarantee.
+
+References: [Formspree Turnstile integration](https://help.formspree.io/articles/form-and-project-settings/protecting-your-forms-with-cloudflare-turnstile/), [Cloudflare widget configuration](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/widget-configurations/), [token validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/).
 
 ## Build version
 
