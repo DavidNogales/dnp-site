@@ -34,5 +34,15 @@ npm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
-.agents/
+# Share OpenSpec workflows; keep unrelated agent state local.
+/.agents/*
+!/.agents/skills/
+/.agents/skills/*
+!/.agents/skills/.openspec-target
+!/.agents/skills/openspec-apply-change/
+!/.agents/skills/openspec-archive-change/
+!/.agents/skills/openspec-explore/
+!/.agents/skills/openspec-propose/
+!/.agents/skills/openspec-sync-specs/
+!/.agents/skills/openspec-update-change/
 .codex/

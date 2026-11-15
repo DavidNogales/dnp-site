@@ -14,6 +14,8 @@ pnpm dev
 
 Run `pnpm build` for production output and `pnpm preview` to serve it locally. `pnpm check` (or `make check`) runs Astro's checks. See [testing](TESTING.md) for browser tests and performance audits.
 
+For spec-driven planning and implementation, see [OpenSpec](OPENSPEC.md).
+
 ## Environment and contact form
 
 Copy `.env.example` to `.env` before configuring local builds. `.env` is ignored by Git; never put private credentials in public frontend variables.

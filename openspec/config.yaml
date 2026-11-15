@@ -1,0 +1,18 @@
+schema: spec-driven
+
+context: |
+  Follow AGENTS.md and docs/STYLE_GUIDE.md for UI changes.
+  Preserve Space Grotesk, Inconsolata, and the Ember Void theme.
+  Keep the website statically deployable to GitHub Pages, including subpaths.
+  Preserve shared YAML content for web and PDF CVs and the one-page PDF layout.
+  Preserve accessibility, reduced-motion behavior, and slow-network usability.
+  Prefer minimal dependencies; do not introduce a backend without an explicit requirement.
+
+rules:
+  proposal:
+    - State scope, non-goals, and user-visible impact concisely.
+  specs:
+    - Write observable requirements and testable scenarios; avoid speculative features.
+  tasks:
+    - Include checks appropriate to the change using docs/TESTING.md.
+    - Include both themes and responsive checks for UI changes, performance audits for loading changes, and PDF pagination checks for CV layout changes.

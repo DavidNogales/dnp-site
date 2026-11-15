@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "openspec": "OPENSPEC_TELEMETRY=0 openspec",
     "dev": "astro dev",
     "build:cv": "node scripts/build-cv.mjs",
     "build": "pnpm build:cv && astro build",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
+    "@fission-ai/openspec": "2.0.0",
     "@lhci/cli": "0.16.1",
     "@playwright/test": "1.65.1",
     "typescript": "^5.9.3"

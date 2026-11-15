@@ -12,3 +12,10 @@ Before modifying UI:
 6. Avoid unnecessary dependencies and visual complexity.
 7. Preserve accessibility and responsive behavior.
 8. Update `docs/STYLE_GUIDE.md` when the design system changes.
+
+## OpenSpec
+
+- Use the repository-local CLI through `pnpm openspec` inside `nix develop`; no global install is required. Use this prefix wherever generated skills show `openspec` commands.
+- OpenSpec workflow skills live in `.agents/skills/`; project constraints live in `openspec/config.yaml`.
+- Keep specs and change artifacts under `openspec/`. Follow the workflow when requested; do not invent proposals for unrelated work.
+- See `docs/OPENSPEC.md` for setup and usage.
