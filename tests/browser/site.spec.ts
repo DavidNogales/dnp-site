@@ -29,6 +29,22 @@ test("navigation preserves theme and initializes each toggle once", async ({ pag
   await expect(page.locator("html")).toHaveAttribute("data-theme", other);
 });
 
+test("sharing image remains dark across themes without a page-load image request", async ({ page, request }) => {
+  const images: string[] = [];
+  page.on("request", r => { if (r.url().includes("social-preview")) images.push(r.url()); });
+  await page.goto("/");
+  const meta = page.locator('meta[property="og:image"]');
+  const url = await meta.getAttribute("content");
+  expect(url).toMatch(/^http:\/\/127\.0\.0\.1:4173\/_astro\/social-preview\.[\w-]+\.png$/);
+  await page.locator(".theme-toggle").click();
+  await page.getByRole("navigation").getByRole("link", { name: "Contact" }).click();
+  await expect(meta).toHaveAttribute("content", url!);
+  expect(images).toEqual([]);
+  const response = await request.get(url!);
+  expect(response.ok()).toBe(true);
+  expect(response.headers()["content-type"]).toContain("image/png");
+});
+
 test("text and theme controls work before fonts finish downloading", async ({ page }) => {
   let release!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });

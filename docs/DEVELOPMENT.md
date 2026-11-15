@@ -73,6 +73,22 @@ Both Typst and the themed `/cv/` page load their content from `cv/data.yaml`; ed
 
 UI changes must follow the authoritative [style guide](STYLE_GUIDE.md).
 
+### Shared-link preview
+
+`Seo.astro` adds Open Graph and Twitter card metadata to every page, using the dark-logo PNG in `src/assets/brand/`. The image URL is absolute, based on `SITE_URL`, and preserves `BASE_PATH`. The preview is always dark; sharing crawlers do not use the visitor's theme toggle. No image request is added to ordinary page rendering.
+
+After changing the logo or dark background token, regenerate and commit the PNG:
+
+```bash
+nix develop 'path:.#test' --command node scripts/build-social-image.mjs
+```
+
+Normal builds need no browser or image-generation step. Astro fingerprints the image URL when its contents change. Deploy before checking Discord/WhatsApp previews; those services may retain previously cached previews. Local tests verify the metadata and image, not third-party cache refresh timing.
+
+Run `pnpm test:social-builds` for root/subpath HTML and PNG checks. Run it separately from other build suites because Astro caches are shared. The regular browser suite also checks that theme changes/navigation preserve the preview URL and that normal page loads do not fetch the sharing image.
+
+### Font assets
+
 The browser uses committed, subset WOFF2 copies of Space Grotesk and Inconsolata. Typst still uses the original TTFs. Regenerate web fonts after updating the sources or supported character ranges:
 
 ```bash
