@@ -1,0 +1,24 @@
+---
+import { resolveBuildVersion } from "../lib/build-version.mjs";
+const version = resolveBuildVersion(import.meta.env.BUILD_COMMIT_SHA, import.meta.env.BUILD_REPOSITORY);
+---
+{version ? (
+  <a class="build-version" href={version.href} aria-label={`Build commit ${version.sha}`} title={version.sha}>
+    {version.shortSha}
+  </a>
+) : (
+  <span class="build-version local">local</span>
+)}
+<style>
+  .build-version {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    min-height: 2.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    white-space: nowrap;
+  }
+  .local { color: var(--muted); }
+</style>

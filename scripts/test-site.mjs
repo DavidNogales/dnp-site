@@ -1,8 +1,9 @@
 import { spawnSync, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
+import { buildMetadata } from "../tests/fixtures/build-version.mjs";
 
 // Override deployment settings; never put a fake form ID in deployable dist/.
-const env = { ...process.env, SITE_URL: "http://127.0.0.1:4173", BASE_PATH: "/", PUBLIC_FORMSPREE_FORM_ID: "test-form" };
+const env = { ...process.env, ...buildMetadata, SITE_URL: "http://127.0.0.1:4173", BASE_PATH: "/", PUBLIC_FORMSPREE_FORM_ID: "test-form" };
 const astro = "node_modules/astro/astro.js";
 function run(command, args) {
   const result = spawnSync(command, args, { env, stdio: "inherit" });

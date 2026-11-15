@@ -34,6 +34,14 @@ To enable contact:
 
 No email address or private API key is placed in frontend form code.
 
+## Build version
+
+The sidebar shows a seven-character commit link below the theme toggle. The deployment workflow supplies `BUILD_COMMIT_SHA` (the full source SHA) and `BUILD_REPOSITORY` (`owner/repository`) automatically. No repository variables or secrets need configuring for these inputs.
+
+Both values are consumed during static rendering. The link uses the full SHA, so cached pages identify their own build even after the branch advances. No browser request or Git command is used to discover a version.
+
+Ordinary local development and builds show non-linked `local` text when metadata is missing or invalid. To preview a particular revision deliberately, supply its full 40-character SHA and repository in the shell before building; do not mistake a local build with uncommitted edits for that deployed revision. If checkout settings change, keep the workflow metadata aligned with the source actually built.
+
 ## Content and CV
 
 Add Markdown or MDX files to `src/content/blog`. Frontmatter is validated in `src/content.config.ts`. The included posts and project descriptions are examples and can be replaced.

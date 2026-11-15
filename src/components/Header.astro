@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
+import BuildVersion from "./BuildVersion.astro";
 import logoDarkUrl from "../assets/brand/rune-harp-dark.svg?url";
 import logoLightUrl from "../assets/brand/rune-harp-light.svg?url";
 const links: Array<[string, string]> = [["/", "Home"], ["/projects", "Projects"], ["/blog", "Blog"], ["/cv/", "CV"], ["/contact", "Contact"]];
@@ -25,6 +26,7 @@ const isCurrent = (href: string) => href === "/" ? Astro.url.pathname === `${bas
   </div>
   <div class="theme-corner">
     <ThemeToggle />
+    <BuildVersion />
   </div>
 </header>
 <style>

@@ -7,7 +7,7 @@
 Install dependencies first with `make install`, then:
 
 ```bash
-make test                       # Type-check, build test site, loading checks, Playwright
+make test                       # Type-check, unit tests, build, loading checks, Playwright
 make perf                       # Five Lighthouse runs/page, mobile profile
 make perf PERF_PROFILE=desktop
 make perf PERF_PROFILE=slow-3g
@@ -18,6 +18,10 @@ Equivalent commands inside `nix develop 'path:.#test'` are `pnpm test` and `pnpm
 For focused debugging, `pnpm test:perf slow-3g /blog/welcome/` runs five measurements of just that configured route. Full profiles take several minutes, especially applied slow-3G; do not run them concurrently.
 
 ## Isolation and browser coverage
+
+`pnpm test:unit` runs build-metadata validation tests with Node's built-in test runner. Browser fixtures use a fixed synthetic commit SHA and repository, overriding shell/CI metadata. Label tests verify exact commit links, keyboard focus, placement below the theme toggle, short-screen scrolling, and rendering with JavaScript and fonts disabled; they never follow the GitHub link.
+
+When changing version metadata, run `pnpm test:version-builds` inside the Nix shell. This checks every generated HTML page across five temporary production builds: valid, absent, invalid SHA, invalid repository, and project subpath. It checks exact destinations, local fallbacks, and unchanged browser JavaScript, then removes only its own temporary output; neither `dist/` nor `.test-dist/` is replaced. Run it separately from browser/performance tests because Astro's generated caches are shared.
 
 Tests build production output into **`.test-dist/`**, leaving deployable `dist/` untouched. The fixture uses `/`, a localhost site URL, and a fake Formspree ID. Browser tests intercept submissions and block third-party traffic. Port **4173** must be free; existing servers are not reused. Reports stay local and are gitignored.
 
