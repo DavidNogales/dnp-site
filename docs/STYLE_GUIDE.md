@@ -27,13 +27,13 @@ Colors live in `src/styles/global.css` as semantic custom properties. Components
 | `--text` | `#E6DDD0` | `#1A1818` | Primary text |
 | `--muted` | `#A79A8D` | `#655C56` | Secondary text and metadata |
 | `--border` | `#302A2A` | `#C4B8AA` | Rules and control boundaries |
-| `--accent` | `#E62317` | `#B91D15` | Links, active navigation, focus |
+| `--accent` | `#F04432` | `#B91D15` | Links, active navigation, focus |
 | `--accent-hover` | `#FF4B2B` | `#95150E` | Hover state |
 | `--code` | `#1B1919` | `#E2D8CC` | Code-block background |
 
 Use red sparingly. Appropriate uses are text links, active navigation, visible focus, and interactive hover states. Do not use red for large backgrounds or ordinary body copy. Use `--surface` only when a distinct reading surface is necessary, not to turn every section into a card.
 
-All text and controls must remain legible in both themes. Never rely on color alone to communicate state: active navigation also uses an underline, and focus uses an outline. New color values, gradients, and translucent decorative overlays require a design-system change.
+All text and controls must remain legible in both themes. The dark Ember red is brightened to `#F04432`: 4.97:1 against `--bg` and 4.65:1 against `--surface`, meeting normal-text contrast requirements. Never rely on color alone to communicate state: active navigation also uses an underline, and focus uses an outline. New color values, gradients, and translucent decorative overlays require a design-system change.
 
 ## Typography
 
@@ -42,7 +42,11 @@ All text and controls must remain legible in both themes. Never rely on color al
 - `--font-sans`: Space Grotesk, then native sans-serif fallbacks. It is used for headings, prose, project descriptions, the HTML CV, inputs, and buttons. Its compact geometry gives the site character while remaining readable.
 - `--font-mono`: Inconsolata, then native monospace fallbacks. It is used for navigation, metadata, dates, technical labels, code, and footer text. It separates interface detail from reading content without adding decoration.
 
-Both families are self-hosted variable TTF files in `src/assets/fonts/`, loaded with `font-display: swap`. `BaseLayout.astro` preloads only Space Grotesk because it renders the primary content. Inconsolata loads when needed. The SIL Open Font License notices are stored beside the fonts. Do not add a remote font request or font-loading package.
+Both families use self-hosted, subset variable WOFF2 files in `src/assets/fonts/`, loaded with `font-display: swap`. The original TTFs remain unchanged for Typst. Web subsets retain Latin and extended Latin (including Spanish accents), combining marks, punctuation, currency, arrows, math, and geometric symbols supported by the originals. Extend the ranges in `scripts/build-web-fonts.sh` before adding other scripts. `BaseLayout.astro` preloads only Space Grotesk because it renders the primary content. Inconsolata loads when needed. The SIL Open Font License notices are stored beside the fonts. Do not add a remote font request or runtime font-loading package.
+
+Astro inlines CSS chunks smaller than 16 KiB to avoid an extra blocking request on ordinary pages. Parsed math nodes flag articles needing KaTeX; only those articles include its processed CSS inline. This deliberate exception for the larger math stylesheet avoids an extra render-blocking round trip on slow connections, trading cross-page CSS caching for earlier text rendering. Other larger stylesheets stay external and cacheable. Keep fonts external rather than embedding their bytes into HTML.
+
+The web Inconsolata file pins the unused width axis to its normal value (100), retaining weights 200–900. Do not introduce condensed/expanded variants without regenerating the font. Combined web fonts have a 105 kB regression budget. Browser tests check both themes and responsive layouts; Lighthouse checks the production build under fixed desktop, mobile, and slow-network profiles. See [local testing](../README.md#repeatable-local-tests).
 
 ### Tokens
 
@@ -131,7 +135,7 @@ The HTML CV uses ordinary sections, headings, definition lists, and restrained s
 
 ## Interaction and animation
 
-Astro's `ClientRouter` handles internal page navigation. Main content stays fully opaque and settles vertically by `.35rem` over 180ms. Its snapshot group does not interpolate page height or width, avoiding distortion between differently sized pages. Do not fade the content to transparency. The sidebar stays visually stationary while its active link updates. `fallback="swap"` avoids sequential fade-out/fade-in when native view transitions are unavailable. Astro suppresses navigation animation for reduced-motion preferences and provides route announcements. Theme state transfers before each page swap. DOM event handlers initialize on `astro:page-load`; contact submissions opt out of router interception with `data-astro-reload`. See the [Astro view transitions guide](https://docs.astro.build/en/guides/view-transitions/) for lifecycle details.
+Astro's `ClientRouter` handles internal page navigation. Main content stays fully opaque and settles vertically by `.35rem` over 180ms. Its snapshot group does not interpolate page height or width, avoiding distortion between differently sized pages. Do not fade the content to transparency. The sidebar stays visually stationary while its active link updates. `fallback="swap"` avoids sequential fade-out/fade-in when native view transitions are unavailable. Astro suppresses navigation animation for reduced-motion preferences and provides route announcements. Theme state transfers before each page swap. DOM event handlers initialize immediately from deferred module scripts and on `astro:after-swap`, without waiting for fonts or `window.load`. WeakSets prevent duplicate listeners. Contact submissions opt out of router interception with `data-astro-reload`. See the [Astro view transitions guide](https://docs.astro.build/en/guides/view-transitions/) for lifecycle details.
 
 Other transitions are limited to short color changes. Theme switching must remain keyboard-operable and update accessible state. Avoid parallax, scroll-triggered reveals, glowing effects, animated backgrounds, and decorative motion.
 

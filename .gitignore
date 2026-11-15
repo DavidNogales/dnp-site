@@ -20,6 +20,11 @@ result-*
 
 # Test coverage and logs
 coverage/
+.test-dist/
+.lighthouseci/
+test-results/
+playwright-report/
+reports/
 *.log
 pnpm-debug.log*
 npm-debug.log*

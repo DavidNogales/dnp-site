@@ -7,7 +7,13 @@
     "build:cv": "node scripts/build-cv.mjs",
     "build": "pnpm build:cv && astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "check:loading": "node scripts/check-loading.mjs",
+    "test:build": "node scripts/test-site.mjs build",
+    "test:serve": "node scripts/test-site.mjs serve",
+    "test:e2e": "pnpm test:build && playwright test",
+    "test:perf": "node scripts/test-performance.mjs",
+    "test": "pnpm check && pnpm test:e2e"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.6",
@@ -21,6 +27,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
+    "@lhci/cli": "0.16.1",
+    "@playwright/test": "1.65.1",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@12.9.0"

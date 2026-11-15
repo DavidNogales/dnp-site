@@ -1,8 +1,12 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-const { title, description, published } = Astro.props;
+import katexStyles from "katex/dist/katex.min.css?inline";
+const { title, description, published, hasMath = false } = Astro.props;
 ---
 <BaseLayout title={`${title} · DNP`} description={description}>
+  <Fragment slot="head">
+    {hasMath && <style is:inline data-math="katex" set:html={katexStyles} />}
+  </Fragment>
   <article class="prose">
     <p class="meta">{published.toLocaleDateString("en", { dateStyle: "long" })}</p>
     <h1>{title}</h1>

@@ -4,7 +4,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import Seo from "../components/Seo.astro";
 import faviconUrl from "../assets/brand/rune-harp-auto.svg?url";
-import spaceGroteskUrl from "../assets/fonts/space-grotesk-variable.ttf?url";
+import spaceGroteskUrl from "../assets/fonts/space-grotesk-variable.woff2?url";
 import "../styles/global.css";
 interface Props { title: string; description: string; }
 const { title, description } = Astro.props;
@@ -23,7 +23,8 @@ const pageTransition = {
     <script is:inline>document.documentElement.dataset.theme=localStorage.getItem('theme')||((matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light')</script>
     <Seo title={title} description={description} />
     <link rel="icon" href={faviconUrl} type="image/svg+xml" />
-    <link rel="preload" href={spaceGroteskUrl} as="font" type="font/ttf" crossorigin="anonymous" />
+    <link rel="preload" href={spaceGroteskUrl} as="font" type="font/woff2" crossorigin="anonymous" />
+    <slot name="head" />
     <link rel="alternate" type="application/rss+xml" title="DNP blog" href={new URL("rss.xml", Astro.site)} />
   </head>
   <body>

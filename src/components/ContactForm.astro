@@ -12,8 +12,11 @@ const formId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID?.trim();
   </form>
 ) : <p class="notice">Contact form not configured. Set <code>PUBLIC_FORMSPREE_FORM_ID</code> to enable it.</p>}
 <script>
-  document.addEventListener("astro:page-load", () => {
+  const initialized = new WeakSet<HTMLFormElement>();
+  function initializeContactForm() {
     const form = document.querySelector<HTMLFormElement>("[data-contact]");
+    if (!form || initialized.has(form)) return;
+    initialized.add(form);
     const status = form?.querySelector<HTMLElement>("[data-status]");
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -28,7 +31,9 @@ const formId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID?.trim();
       } catch { status.textContent = "Message could not be sent. Please try again."; }
       finally { if (button) button.disabled = false; }
     });
-  });
+  }
+  initializeContactForm();
+  document.addEventListener("astro:after-swap", initializeContactForm);
 </script>
 <style>
   form { max-width: var(--reading); display: grid; gap: 1.35rem; }

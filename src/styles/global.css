@@ -1,8 +1,6 @@
-@import "katex/dist/katex.min.css";
-
 @font-face {
   font-family: "Space Grotesk";
-  src: url("../assets/fonts/space-grotesk-variable.ttf") format("truetype");
+  src: url("../assets/fonts/space-grotesk-variable.woff2") format("woff2");
   font-style: normal;
   font-weight: 300 700;
   font-display: swap;
@@ -10,10 +8,9 @@
 
 @font-face {
   font-family: "Inconsolata";
-  src: url("../assets/fonts/inconsolata-variable.ttf") format("truetype");
+  src: url("../assets/fonts/inconsolata-variable.woff2") format("woff2");
   font-style: normal;
   font-weight: 200 900;
-  font-stretch: 50% 200%;
   font-display: swap;
 }
 
@@ -24,7 +21,7 @@
   --text: #e6ddd0;
   --muted: #a79a8d;
   --border: #302a2a;
-  --accent: #e62317;
+  --accent: #f04432;
   --accent-hover: #ff4b2b;
   --code: #1b1919;
   --max: 60rem;
