@@ -19,6 +19,7 @@ export function initializeContact() {
   const send = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
   const retry = form.querySelector<HTMLButtonElement>("[data-retry]")!;
   const status = form.querySelector<HTMLElement>("[data-status]")!;
+  const statusText = status.querySelector<HTMLElement>("[data-status-text]")!;
   const region = form.querySelector<HTMLElement>("[data-verification]")!;
   const container = form.querySelector<HTMLElement>("[data-turnstile]")!;
   const listeners = new AbortController();
@@ -37,7 +38,10 @@ export function initializeContact() {
   const theme = (): "dark" | "light" => document.documentElement.dataset.theme === "dark" ? "dark" : "light";
   let renderedTheme = theme();
   const alive = () => active && form.isConnected;
-  const announce = (message: string) => { status.textContent = message; };
+  const announce = (message: string, state: "idle" | "pending" | "success" | "error" = "idle") => {
+    statusText.textContent = message;
+    status.dataset.state = state;
+  };
   const controls = () => {
     fieldset.disabled = sending;
     send.disabled = sending || pending;
@@ -52,13 +56,14 @@ export function initializeContact() {
     if (widget !== undefined) api?.remove(widget);
     widget = undefined;
     container.replaceChildren();
+    region.hidden = true;
   };
   const verificationFailed = (message: string) => {
     clearWidget();
     pending = false;
     retry.hidden = false;
     controls();
-    announce(message);
+    announce(message, "error");
   };
   const clearErrors = () => {
     form.querySelectorAll("[aria-invalid]").forEach(el => el.removeAttribute("aria-invalid"));
@@ -70,8 +75,7 @@ export function initializeContact() {
     attempted = true;
     starting = true;
     retry.hidden = true;
-    region.hidden = false;
-    announce("Verifying… Complete the verification if prompted.");
+    announce("Verifying… Complete the verification if prompted.", "pending");
     const ownGeneration = ++generation;
     const valid = () => alive() && ownGeneration === generation;
     try {
@@ -82,14 +86,21 @@ export function initializeContact() {
         sitekey: form.dataset.sitekey!, theme: renderedTheme, size: "compact",
         appearance: "interaction-only", retry: "never", "refresh-expired": "manual",
         "refresh-timeout": "manual", "response-field": false,
+        "before-interactive-callback"() {
+          if (valid() && !sending && !token) region.hidden = false;
+        },
+        "after-interactive-callback"() {
+          if (valid()) region.hidden = true;
+        },
         callback(value) {
           if (!valid() || sending || token || !value) return;
           token = value;
+          region.hidden = true;
           tokenTime = Date.now();
           expiry = setTimeout(() => {
             if (valid() && !sending) verificationFailed("Verification expired. Retry verification before sending.");
           }, 300_000);
-          announce("Verification complete. Ready to send.");
+          announce("Verification complete. Ready to send.", "success");
           if (pending) void submit();
         },
         "error-callback"() {
@@ -125,7 +136,7 @@ export function initializeContact() {
     retry.hidden = true;
     clearErrors();
     controls();
-    announce("Sending…");
+    announce("Sending…", "pending");
     request = new AbortController();
     const controller = request;
     const timer = setTimeout(() => controller.abort(), 30_000);
@@ -135,7 +146,7 @@ export function initializeContact() {
       });
       const result: unknown = await response.json().catch(() => null);
       if (!alive() || controller.signal.aborted) {
-        if (alive()) announce(uncertain);
+        if (alive()) announce(uncertain, "error");
         return;
       }
       // Formspree's current SDK recognizes "next"; do not follow that URL.
@@ -145,9 +156,9 @@ export function initializeContact() {
         && (typeof result.next === "string" || result.ok === true);
       if (response.ok && accepted) {
         form.reset();
-        announce("Message sent. Thank you.");
+        announce("Message sent. Thank you.", "success");
       } else if (response.ok && !hasErrors) {
-        announce(uncertain);
+        announce(uncertain, "error");
       } else {
         const messages: string[] = [];
         if (record(result)) {
@@ -162,10 +173,10 @@ export function initializeContact() {
             }
           }
         }
-        announce(`Message could not be sent (HTTP ${response.status}). ${messages.join(" ") || "Please try again later."}`);
+        announce(`Message could not be sent (HTTP ${response.status}). ${messages.join(" ") || "Please try again later."}`, "error");
       }
     } catch {
-      if (alive()) announce(uncertain);
+      if (alive()) announce(uncertain, "error");
     } finally {
       clearTimeout(timer);
       request = undefined;

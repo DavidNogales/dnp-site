@@ -14,7 +14,15 @@ const config = resolveContactConfig(import.meta.env.PUBLIC_FORMSPREE_FORM_ID, im
     <button class="button" type="submit">Send message</button>
     <button class="button" type="button" data-retry hidden>Retry verification</button>
     </fieldset>
-    <p data-status role="status" aria-live="polite" aria-atomic="true">Preparing secure contact form…</p>
+    <p data-status data-state="idle" role="status" aria-live="polite" aria-atomic="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <g data-icon="idle"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6Z" /></g>
+        <g data-icon="pending"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></g>
+        <g data-icon="success"><circle cx="12" cy="12" r="9" /><path d="m8 12 3 3 5-6" /></g>
+        <g data-icon="error"><path d="m12 3 10 18H2Z M12 9v5 M12 17v.1" /></g>
+      </svg>
+      <span data-status-text>Preparing secure contact form…</span>
+    </p>
     <noscript><p>JavaScript is required for protected contact submission. Enable it to send a message without leaving this page.</p></noscript>
   </form>
 ) : <p class="notice" data-contact-unavailable>Contact form unavailable. Public form and verification configuration are required.</p>}
@@ -38,9 +46,14 @@ const config = resolveContactConfig(import.meta.env.PUBLIC_FORMSPREE_FORM_ID, im
   .notice { color: var(--muted); }
   [data-field-error]:empty { display: none; }
   [data-field-error] { font-weight: var(--weight-regular); }
-  [data-verification] { min-height: 140px; }
   [hidden] { display: none; }
-  [data-status] { min-height: 3.3em; margin-block: 1.35rem 0; color: var(--muted); }
+  [data-status] { display: flex; align-items: flex-start; gap: .5rem; min-height: 3.3em; margin-block: 1.35rem 0; color: var(--muted); }
+  [data-status] svg { flex: none; width: 1.15em; height: 1.15em; margin-top: .2em; }
+  [data-icon] { display: none; }
+  [data-state="idle"] [data-icon="idle"],
+  [data-state="pending"] [data-icon="pending"],
+  [data-state="success"] [data-icon="success"],
+  [data-state="error"] [data-icon="error"] { display: inline; }
   button:disabled { cursor: wait; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 </style>

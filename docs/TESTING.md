@@ -27,7 +27,7 @@ Tests build production output into **`.test-dist/`**, leaving deployable `dist/`
 
 Playwright runs one worker, zero retries, fresh contexts, fixed English locale/UTC timezone, and four projects: desktop/mobile × light/dark. Coverage includes navigation/back/reload, theme persistence, blocked-font interactivity, loaded fonts, math-only CSS, text-token contrast, overflow, reduced motion, mocked inline contact submission, and PDF availability. Failures retain screenshots/traces under `test-results/`; open the HTML report with `pnpm exec playwright show-report`.
 
-Contact tests intercept both Cloudflare and Formspree. The synthetic public site key and fake form ID override local/CI settings only in `.test-dist/`; deployable `dist/` is untouched. No real verification or email is performed. Tests cover lazy/blocked/slow loading, expiry, theme replacement, navigation cleanup, single-flight AJAX, exact payload, inline errors, timeouts, preserved input, and disabled-JavaScript safety. Run focused checks with:
+Contact tests intercept both Cloudflare and Formspree. The synthetic public site key and fake form ID override local/CI settings only in `.test-dist/`; deployable `dist/` is untouched. No real verification or email is performed. Tests cover lazy/blocked/slow loading, expiry, theme replacement, navigation cleanup, single-flight AJAX, exact payload, inline errors, timeouts, preserved input, and disabled-JavaScript safety. The provider fixture invokes the official script `onload` callback and rejects `ready()` with async/defer scripts. Regression cases check late script arrival before/after retry without duplicate imports, collapsed silent/failed widget space, interactive keyboard access, and icon-plus-text feedback. Run focused checks with:
 
 ```bash
 pnpm test:build
@@ -80,3 +80,11 @@ Reproduce with `pnpm test:perf mobile /`, `pnpm test:perf mobile /contact/`, `pn
 Separately, the mocked delayed-interaction tests held the provider script while typing, verified a single shared request, exercised a 30-second load deadline/retry, and released a late load after navigation while fonts remained blocked. Form input remained usable; stale callbacks did not create a detached widget or send a message. This is deterministic lifecycle coverage, not a measurement of Cloudflare's real challenge latency.
 
 Outstanding operator checks: configure the real widget and Formspree secret, coordinate rollout, then authorize one accepted-message/receipt check and one invalid-token rejection check. No production admin changes, real messages, or real-provider validation were performed here.
+
+### Production loader regression
+
+The original mock above accepted `turnstile.ready()` on an async script, unlike the real provider. Consequently, the original passing suite did not catch the production loader failure. The updated fixture reproduces that restriction. Loading now uses the provider's URL `onload` callback; the 30-second UI deadline retains the pending script, so retries cannot import the same API twice. Widget space is shown only between interactive callbacks, not reserved during silent verification or failures. The historical Lighthouse measurements above predate this fix.
+
+Fix verification: `pnpm test` passed type-checking, six unit tests, loading checks, and **136 browser cases** across all four projects. `pnpm test:contact-builds` passed all five variants. Real-provider challenge and mail delivery remain operator checks, not covered by these mocks.
+
+Operator follow-up — 2026-11-15: the user confirmed production verification reached “Verification complete. Ready to send.” and subsequently reported the contact flow worked. Cloudflare iframe console warnings did not prevent that verification. This is user-reported production evidence, not an automated live test; inbox receipt and a deliberate invalid-token rejection check were not separately confirmed.

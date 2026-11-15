@@ -28,6 +28,8 @@ test.beforeEach(async ({ context, page }) => {
 
 test("lazy verification, local validation, exact AJAX payload and single acceptance", async ({ page }) => {
   let loads = 0, posts = 0;
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
   page.on("request", r => { if (r.url().includes("challenges.cloudflare.com")) loads++; });
   await page.route(endpoint, async route => {
     posts++;
@@ -64,6 +66,8 @@ test("lazy verification, local validation, exact AJAX payload and single accepta
   await expect(message(page)).toHaveValue("");
   expect(posts).toBe(1);
   expect(loads).toBe(1);
+  expect(errors).toEqual([]);
+  await expect(status(page)).toHaveAttribute("data-state", "success");
   await expect(page).toHaveURL(/\/contact\/?$/);
 });
 
@@ -99,6 +103,8 @@ test("blocked script retries; slow script shares one load and never blocks typin
   await page.goto("/contact/");
   await message(page).fill("Keep this message");
   await expect(status(page)).toContainText("could not load");
+  await expect(page.locator("[data-verification]")).toBeHidden();
+  await expect(status(page)).toHaveAttribute("data-state", "error");
   await page.getByRole("button", { name: "Retry verification" }).click();
   await page.getByRole("textbox", { name: "Email address" }).fill("test@example.com");
   await send(page).click();
@@ -124,6 +130,77 @@ test("script deadline enables retry without automatic POST", async ({ page }) =>
   await page.route(provider, route => route.fulfill({ contentType: "text/javascript", body: fixture }));
   await page.getByRole("button", { name: "Retry verification" }).click();
   await expect.poll(() => count(page)).toBe(1);
+});
+
+for (const arrival of ["before retry", "after retry"]) {
+  test(`late script ${arrival} reuses one API load after the deadline`, async ({ page }) => {
+    await page.clock.install();
+    let held: import("@playwright/test").Route | undefined;
+    let loads = 0, posts = 0;
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.route(provider, route => { loads++; held = route; });
+    await page.route(endpoint, route => { posts++; return route.fulfill({ json: { ok: true } }); });
+    await page.goto("/contact/");
+    await message(page).fill("Keep this message");
+    await expect.poll(() => !!held).toBe(true);
+    await page.clock.fastForward(30_001);
+    await expect(status(page)).toContainText("could not load");
+    const release = async () => {
+      await held!.fulfill({ contentType: "text/javascript", body: fixture });
+      await expect.poll(() => page.evaluate(() => (window as any).__turnstileMock?.loads)).toBe(1);
+    };
+    if (arrival === "before retry") {
+      await release();
+      expect(await count(page)).toBe(0);
+    }
+    await page.getByRole("button", { name: "Retry verification" }).click();
+    if (arrival === "after retry") await release();
+    await expect.poll(() => count(page)).toBe(1);
+    await callback(page, "error-callback");
+    await page.getByRole("button", { name: "Retry verification" }).click();
+    await expect.poll(() => count(page)).toBe(2);
+    await callback(page);
+    await expect(status(page)).toContainText("Verification complete");
+    await expect(message(page)).toHaveValue("Keep this message");
+    expect(loads).toBe(1);
+    expect(posts).toBe(0);
+    expect(errors).toEqual([]);
+  });
+}
+
+test("silent verification leaves no widget gap; interactive challenge remains accessible", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.addInitScript(() => {
+    (window as any).__turnstileMock = { widgets: [], removed: [], loads: 0, silent: true };
+  });
+  await page.goto("/contact/");
+  const gap = () => page.evaluate(() => {
+    const field = document.querySelector('textarea[name="message"]')!.getBoundingClientRect();
+    const button = document.querySelector('button[type="submit"]')!.getBoundingClientRect();
+    return button.top - field.bottom;
+  });
+  const initialGap = await gap();
+  await fill(page);
+  await expect(page.locator("[data-verification]")).toBeHidden();
+  expect(await gap()).toBeCloseTo(initialGap, 0);
+  expect(initialGap).toBeLessThan(40);
+  await expect(status(page)).toHaveAttribute("data-state", "pending");
+  await expect(page.locator('[data-icon="pending"]')).toBeVisible();
+  await callback(page, "before-interactive-callback");
+  await expect(page.getByRole("button", { name: "Mock verification" })).toBeVisible();
+  await message(page).focus();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Mock verification" })).toBeFocused();
+  await callback(page, "after-interactive-callback");
+  expect(await gap()).toBeCloseTo(initialGap, 0);
+  await callback(page);
+  await expect(page.locator('[data-icon="success"]')).toBeVisible();
+  expect(await gap()).toBeCloseTo(initialGap, 0);
+  await callback(page, "expired-callback");
+  await expect(page.locator('[data-icon="error"]')).toBeVisible();
+  await expect(page.locator("[data-verification]")).toBeHidden();
+  expect(await gap()).toBeCloseTo(initialGap, 0);
 });
 
 for (const failure of ["expired-callback", "error-callback", "timeout-callback"]) {

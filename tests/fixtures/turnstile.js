@@ -3,8 +3,12 @@
 window.__turnstileMock = window.__turnstileMock || { widgets: [], removed: [], loads: 0 };
 const mock = window.__turnstileMock;
 mock.loads++;
+const script = document.currentScript;
 window.turnstile = {
-  ready(callback) { callback(); },
+  ready(callback) {
+    if (script.async || script.defer) throw new Error('Remove async/defer from the Turnstile api.js script tag before using turnstile.ready().');
+    callback();
+  },
   render(container, options) {
     const id = String(mock.widgets.length);
     const checkbox = document.createElement('button');
@@ -14,6 +18,7 @@ window.turnstile = {
     checkbox.onclick = () => options.callback('fixture-token-' + id);
     container.append(checkbox);
     mock.widgets.push({ id, options, container });
+    if (!mock.silent) options['before-interactive-callback']();
     return id;
   },
   remove(id) {
@@ -21,4 +26,6 @@ window.turnstile = {
     mock.widgets[Number(id)].container.replaceChildren();
   },
 };
+const onload = new URL(script.src).searchParams.get('onload');
+if (onload) window[onload]();
 })();
